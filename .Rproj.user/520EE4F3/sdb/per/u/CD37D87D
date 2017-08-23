@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "sim_widget_data <- function(N, noise=100){\n  \n  N=1000\n  x_temp <- rnorm(N,mean = 10,sd = 3.3)\n  x<-x_temp\n  x[which(x_temp <0)]<-x_temp[which(x_temp <0)]*(-1)\n  x[which(x_temp >20)]<-x_temp[which(x_temp >20)]-20\n  y <-  - 5*x + 100 + rnorm(N, sd=noise)\n  z<-runif(N)\n  \n  bad_widget <- factor(y > 75) #original\n  data.frame(x, y,z, bad_widget)\n}\nwidget_data <- sim_widget_data(1000, 0)\nplot(widget_data$x,widget_data$y, col=widget_data$bad_widget)\n",
+    "created" : 1501947831060.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "2225498008",
+    "id" : "CD37D87D",
+    "lastKnownWriteTime" : 31244096080117880,
+    "last_content_update" : 1501948845507,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled2"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

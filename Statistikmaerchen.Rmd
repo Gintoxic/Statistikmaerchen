@@ -1,0 +1,283 @@
+---
+title: "Die Fräse und der Data Scientist"
+author: "Ein Industrie 4.0 Märchen"
+date: " Eugene Harschack"
+output: ioslides_presentation
+---
+
+
+
+## Das Statistikermärchen
+
+Liebe Leser,</p>
+dies ist ein Märchen, welches wohl eines der ersten seiner Art ist. Nicht nur handelt es von Data Science, was für Märchen ein eher ungewöhnliches Thema ist, es ist dabei vollständig in RMarkdown geschrieben. </p>
+Darum sollen Sie sich nicht darüber wundern, wenn Sie feststellen, dass sich die Zahlen, wie von magischer Hand, geändert haben. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr)
+library(pROC)
+```
+
+```{r time, include=TRUE}
+print("Dieses Märchen wurde erstellt am:")
+print(Sys.time())
+```
+
+
+
+## Vor langer langer Zeit, in einem fernen Industrie-Land ...
+... stand in einer kleinen Firma die gute alte Fräse.
+Und in dieser Firma arbeiteten:
+
+- ein Manager,
+
+- ein Maschinenschlosser,
+
+- und ein Data Scientist Scientist.
+
+Was aber eigentlich nichts zur Sache tut, denn in diesem Märchen geht es um die Variablen
+**x**, **y** und **z**
+
+
+
+## x
+
+- **x** war der Wasserdruck zur Kühlung der Fräse. Fiel die Anzeige unter 5, lief die Fräse heiß und der Rohling nicht mehr zu retten.
+<center>![](http://harschack.de/downloads/maerchen/anzeige_klein.png)
+
+
+
+
+
+
+## ...
+
+```{r chunk1, echo = FALSE}
+sim_widget_data <- function(noise=10){
+  N=2000
+  x_temp <- rnorm(N,mean = 10,sd = 5)
+  x<-x_temp
+  x[which(x_temp <0)]<-x_temp[which(x_temp <0)]*(-1)
+  x[which(x_temp >20)]<-x_temp[which(x_temp >20)]-20
+  
+  y_temp <-  - 10*x + 200 + rnorm(N, sd=noise)
+  y<-y_temp
+  y[which(y_temp <0)]<-y_temp[which(y_temp <0)]*-1
+  z<-runif(N)
+  
+  bad_widget <- factor(y > 150) #original
+  data.frame(x, y,z, bad_widget)
+}
+widget_data <- sim_widget_data(0)
+```
+
+
+```{r chunk2, echo = TRUE}
+hist(widget_data$x, breaks=20,col=c(rep("red",5),rep("grey50",15)))
+```
+
+
+## Y
+- **y** war die abhängige Variable. Sie war die tatsächliche Temperatur der Fräse
+```{r chunk3, echo = FALSE}
+plot(widget_data$x, widget_data$y, col=widget_data$bad_widget, pch=20, 
+     main="Ausfall bei 150°")
+abline(h=150, col="red", lty=2)
+abline(v=5, col="red", lty=2)
+```
+
+
+## Die Korrelation
+Der Zusammenhang zwischen Wasserdruck und Temperatur ist in Vergessenheit geraten, aber angesichts der hohen Korrelation zweifelte niemand an der Zuverlässigkeit der Anzeige.
+```{r chunk4, echo = TRUE}
+cor(widget_data$x, widget_data$y)
+```
+
+## Z
+- **z** war eine weitere Anzeige. Was niemand mehr wusste war, dass man hier nur der Wasserstand im Spülkasten des goldenen Throns ablesen konnte.
+![](http://harschack.de/downloads/maerchen/thron.jpg)
+
+## Dieser Wasserstand...
+... hatte nichts, aber auch gar nichts, mit der Temperatur unserer Fräse zu tun.
+```{r chunk6, echo = TRUE}
+plot(widget_data$z, widget_data$y, col=widget_data$bad_widget, pch=20)
+```
+
+
+## Aber dann wurde die Genauigkeit schlechter (noise=10)
+```{r chunk7, echo = FALSE}
+widget_data <- sim_widget_data(10)
+plot(widget_data$x, widget_data$y, col=widget_data$bad_widget, pch=20)
+abline(h=150, col="red", lty=2)
+abline(v=5, col="red", lty=2)
+abline(v=max(widget_data$x[which(widget_data$bad_widget==T)]), col="orange", lty=2, lwd=2)
+```
+
+## ... und schlechter ... (noise=20)
+```{r chunk9, echo = FALSE}
+widget_data <- sim_widget_data(20)
+plot(widget_data$x, widget_data$y, col=widget_data$bad_widget, pch=20)
+abline(h=150, col="red", lty=2)
+abline(v=5, col="red", lty=2)
+abline(v=max(widget_data$x[which(widget_data$bad_widget==T)]), col="orange", lty=2, lwd=2)
+```
+
+
+## ... und noch schlechter ... (noise=30)
+```{r chunk11, echo = FALSE}
+widget_data <- sim_widget_data(30)
+plot(widget_data$x, widget_data$y, col=widget_data$bad_widget, pch=20)
+abline(h=150, col="red", lty=2)
+abline(v=5, col="red", lty=2)
+abline(v=max(widget_data$x[which(widget_data$bad_widget==T)]), col="orange", lty=2, lwd=2)
+```
+
+
+## So schlecht... (noise=100)
+... dass kaum noch jemand der alten Anzeige Glauben schenken wollte.
+```{r chunk13, echo = FALSE}
+widget_data <- sim_widget_data(100)
+plot(widget_data$x, widget_data$y, col=widget_data$bad_widget, pch=20)
+abline(h=150, col="red", lty=2)
+abline(v=5, col="red", lty=2)
+abline(v=max(widget_data$x[which(widget_data$bad_widget==T)]), col="orange", lty=2, lwd=2)
+```
+
+
+## Eines Abends
+Nach ein paar Flaschen Ale kamen der Manager und der Schlosser auf die Idee, dass man doch glatt z als Warnsignal für die Fräse verwenden könnte. Wie viel schlechter kann es schon werden?
+```{r chunk14, echo = TRUE}
+cor(widget_data$x, widget_data$y)
+cor(widget_data$z, widget_data$y)
+```
+
+## In Zeiten größter Not kam wie aus dem nichts...
+... der Data Scientist. Er trug eine kleine magische Kiste mit sich. Darin lanweilten sich das  **Model GLM**, ein äußerst **verallgmeinertes** und **lineares Model(l)**, und ein kleiner **Waldscharat**, zufällig wie alle Bewohner des **randomForest**
+
+![Waldscharat](http://harschack.de/downloads/maerchen/waldscharat.png)
+
+
+## Der Data Scientist machte sich ans Werk.
+Wie es in seiner Zunft seit jeher Brauch ist, bildete er eine Stichprobe, damit seine Begleiter einen Datensatz zum Training und einen zum Testen erhalten.
+```{r chunk15, echo = TRUE}
+test_set_idx <- sample(1:nrow(widget_data), 
+                       size=floor(nrow(widget_data)/4))
+test_set <- widget_data[test_set_idx,]
+train_set <- widget_data[-test_set_idx,]
+```
+
+## ...
+```{r chunk16, echo = TRUE}
+plot(train_set$x,train_set$y,col=train_set$bad_widget, pch="+")
+points(test_set$x,test_set$y,col=test_set$bad_widget, pch=1)
+```
+
+## Er ließ das GLM aus der Kiste, ...
+... sofort fing das Model an, wie verrückt, zu trainieren...
+```{r chunk17, echo = TRUE}
+fit_glm_x <- glm(bad_widget ~ x, train_set, family=binomial(link="logit"))
+fit_glm_z <- glm(bad_widget ~ z, train_set, family=binomial(link="logit"))
+```
+
+## ...bis für x und z jeweils ein Modell entstand, um den Ausschuss zu erklären
+```{r chunk18, echo = FALSE}
+pred_glm_lx <- predict(fit_glm_x, test_set, type="link")
+pred_glm_lz <- predict(fit_glm_z, test_set, type="link")
+```
+
+```{r chunk18a, echo = TRUE}
+pred_glm_rx <- predict(fit_glm_x, test_set, type="response")
+pred_glm_rz <- predict(fit_glm_z, test_set, type="response")
+
+```
+
+## Der Schlosser...
+konnte dem bunten Treiben nichts abgewinnen und verließ sich weiter auf seinen Erfahrungswert von 5
+
+```{r chunk19c, echo = FALSE}
+test_set$int=NA
+test_set$int[which(test_set$x<5)]<-1
+test_set$int[which(test_set$x>=5)]<-0
+tab_int<-table(test_set$int,test_set$bad_widget)
+print(tab_int)
+```
+
+Damit in
+```{r chunk19d, echo = FALSE}
+print(sum(diag(tab_int))/sum(tab_int)*100)
+
+```
+Prozent richtig
+
+
+## Das Modell kam auf...
+```{r chunk19a, echo = FALSE}
+glm_rx_cut<-cut(pred_glm_rx,breaks = c(-Inf, 0.5, Inf), labels=c(0,1))%>%
+  as.character()%>%
+  as.integer()%>%
+  as.logical()
+tab_glm_x<-table(glm_rx_cut,test_set$bad_widget)
+```
+```{r chunk19b, echo = FALSE}
+print(tab_glm_x)
+
+```
+also in
+```{r chunk19e, echo = FALSE}
+print(sum(diag(tab_glm_x))/sum(tab_glm_x)*100)
+```
+Prozent richtig
+
+## X ist besser
+Sagte der Schlosser. Schließlich liegt es in
+```{r chunk20, echo = FALSE}
+
+```
+Prozent richtig.
+
+
+
+## Was ist denn mit z passiert?
+```{r chunk21a, echo = FALSE}
+glm_rz_cut<-cut(pred_glm_rz,breaks = c(-Inf, 0.5, Inf), labels=c(0,1))%>%
+  as.character()%>%
+  as.integer()%>%
+  as.logical()
+tab_glm_z<-table(glm_rz_cut,test_set$bad_widget)
+```
+
+```{r chunk21b, echo = TRUE}
+tab_glm_z
+
+```
+
+## Können wir nicht trotzdem z verwenden?
+-fragte der Manager. Schließlich war der Sensor teuer und
+```{r chunk22, echo = FALSE}
+(sum(diag(tab_glm_z))/sum(tab_glm_z))*100
+```
+Prozent Genauigkeit sind doch gar nicht so schlecht.
+
+-**Nein**, antwortete der Data Scientist, kreidebleich, mit dem Ausdruck von blankem Entsetzten im Gesicht.
+
+## Zum Glück kam zufällig eine ROC-Kurve vorbei
+Sie sah sich an, was das verallgemeinerte lineare Modell aus x und z genacht hatte und konnte so einige Zweifel klären.
+```{r chunk23, echo = FALSE}
+roc_glm_x<-roc(test_set$bad_widget, pred_glm_rx, direction="<")
+roc_glm_z<-roc(test_set$bad_widget, pred_glm_rz, direction="<")
+roc_int<-roc(test_set$bad_widget, test_set$int, direction="<")
+
+
+plot(roc_glm_x, col="red", lwd=2)
+lines(roc_glm_z, col="magenta",lwd=2)
+lines(roc_int, col="blue", lwd=2)
+```
+
+
+## Laßt das mal den Papa machen, 
+mischte sich der Zufällige Waldscharat ein, der bis dahin still und fast regungslos in der Ecke gesessen hatte.
+
+```{r chunk24, echo = FALSE}
+
+```

@@ -1,0 +1,10 @@
+Abstract - Die Fräse und der Data Scientist - Ein Industrie-4.0-märchen
+
+Wer ist ein Data Scientist? Und wie erklärt man den Beruf einer Schulklasse?
+
+Klassische Erklärungsversuche bemühen sich um eine Definition nach Verfahren. Schnell fallen Begriffe wie Signalverarbeitung, Wahrscheinlichkeitsmodelle und maschinelles Lernen. Bei Gesprächspartnern ohne vertiefter Statistikkenntnisse wirft dieser Versuch nur noch mehr Fragen auf.
+Der historische Ansatz, dass 1996 eine Konferenz der International Federation of Classification Societies (IFCS) in Kobe unter dem Titel "Data Science" stattgefunden hatte, führt auch selten zum gewünschten Ergebnis. Wir bemühen uns um anschauliche Beispiele, wie dem des Wegbereiters der Epidemiologie, John Snow, der 1854 Cholerafälle auf einer Karte aufgetragen und damit eine Wasserpumpe als Ursprung der Krankheit ausgemacht hat.
+
+Der hier gewählte Ansatz führt uns zurück in eine Zeit weit vor 1996, 1941 (Konrad Zuse), 1854 oder 1837 (Charles Babbage), in eine Zeit vor geschriebener Sprache, als Sachverhalte durch Märchen und Fabeln erklärt wurden.
+
+Bedient euch an Kakao und Keksen! Lehnt euch zurück und hört die Geschichte von der Fräse, dem Schlosser, dem Manager und dem Data Scientist, einem modernen Märchen aus dem Industrieland 4.0. Dem einen zur Unterhaltung, dem Anderen zur Lehre, wenden wir an einem einfachen Beispiel bekannte Verfahren an und bestaunen gemeinsam das Ergebnis.
